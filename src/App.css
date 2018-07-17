@@ -1,0 +1,18 @@
+@import '~antd/dist/antd.css';
+.App {
+  text-align: center;
+  margin :100px;
+}
+.table{
+  border: 1px solid #ebeef3;
+  margin-bottom: 20px;
+}
+.table>tbody>tr>td{
+  width: 150px;
+  padding: 6px;
+}
+.table>tbody>tr:nth-child(1)>td{
+  color: #545564;
+  font-weight: bolder;
+}
+
