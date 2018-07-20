@@ -1,142 +1,185 @@
 import React, {Component} from 'react';
 import './App.css';
 
-const dataObj = {
-    title: ['MYCT', 'MMIN', 'MMAX', 'CACH', 'CHMI', 'CHMA','AAA','bbb'],
-    weight: [
-        [0.6549, -159.6171, 1.1039, -12.106, -46.9917, -13.2275,1,2],
-        [8.1921, 232.21, 8.5437, 2.0259, 70.7124, 3.2245,1,2],
-        [0.6549, -159.6171, 1.1039, -12.106, -46.9917, -13.2275,1,2],
-        [0.6549, -159.6171, 1.1039, -12.106, -46.9917, -13.2275,1,2],
-        [8.1921, 232.21, 8.5437, 2.0259, 70.7124, 3.2245,1,2],
-        [0.6549, -159.6171, 1.1039, -12.106, -46.9917, -13.2275,1,2],
-        [0.6549, -159.6171, 1.1039, -12.106, -46.9917, -13.2275,1,2],
-        [0.6549, -159.6171, 1.1039, -12.106, -46.9917, -13.2275,1,2],
-        [0.6549, -159.6171, 1.1039, -12.106, -46.9917, -13.2275,1,2],
-    ],
-    value:[-94.2603,92.5345,146.1454,97.1049,70.1302,58.756,-161.2842,111,2222],
-    class:[0.6549, -159.6171, 1.1039, -12.106, -46.9917, -13.2275,1,2,3]
-};
 class App extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            dependentVars: [],
+            hidingCount: 0,
+            hidingToOutput: {
+                threshold: {},
+                weight: {
+                    calss: []
+                }
+            },
+            independentVars: [],
+            inputToHiding: {
+                threshold: [],
+                weight: [],
+            }
+        };
+        this.getDataSource = this.getDataSource.bind(this);
+    }
+
+    componentWillMount() {
+        this.getDataSource();
+    }
+
+    getDataSource() {
+        fetch(`http://192.168.10.34:3000/dnndata`)
+            .then((res) => (res.json()))
+            .then((res) => {
+                console.log('res', res);
+                this.setState({
+                    dependentVars: res.dependentVars,
+                    hidingCount: res.hidingCount,
+                    hidingToOutput: {
+                        threshold: res.hidingToOutput.threshold,
+                        weight: res.hidingToOutput.weight
+                    },
+                    independentVars: res.independentVars,
+                    inputToHiding: {
+                        threshold: res.inputToHiding.threshold,
+                        weight: res.inputToHiding.weight,
+                    }
+                });
+            });
+
+    }
+
     render() {
+        const {independentVars,inputToHiding,hidingToOutput} = this.state;
         return (
-            <div className="App">
+            independentVars.length > 0 ?
+                <div className="App">
                 <span>
 
                 </span>
-                <table border="1" cellSpacing="0" className="table">
-                    <tbody>
-                    <tr>
-                        <td rowSpan={dataObj.weight.length+2} style={{width:'80px'}}>权重=</td>
-                        <td rowSpan='2'>
-                        </td>
-                        {dataObj.title.map((val, key) => {
+                    <table border="1" cellSpacing="0" className="table">
+                        <tbody>
+                        <tr>
+                            <td rowSpan={this.state.inputToHiding.weight.length + 2} style={{width: '80px'}}>权重=</td>
+                            <td rowSpan='2'>
+                            </td>
+                            {this.state.independentVars.map((val, key) => {
+                                return (
+                                    <td key={key}>输入层节点{key + 1}</td>
+                                )
+                            })}
+                            <td rowSpan={this.state.inputToHiding.weight.length + 2} style={{width: '30px'}}>
+
+                            </td>
+                            <td rowSpan={this.state.inputToHiding.weight.length + 2} style={{width: '80px'}}>
+                                阈值=
+                            </td>
+                            <td rowSpan='2'>
+
+                            </td>
+                            <td rowSpan='2'>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            {independentVars.map((val, key) => {
+                                return (
+                                    <td key={key}>{val}</td>
+                                )
+                            })}
+                        </tr>
+                        {inputToHiding.weight.map((val, key) => {
                             return (
-                                <td key={key}>输入层节点{key + 1}</td>
-                            )
-                        })}
-                        <td rowSpan={dataObj.weight.length+2} style={{width:'30px'}}>
-
-                        </td>
-                        <td rowSpan={dataObj.weight.length+2} style={{width:'80px'}}>
-                            阈值=
-                        </td>
-                        <td rowSpan='2'>
-
-                        </td>
-                        <td rowSpan='2'>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        {dataObj.title.map((val, key) => {
-                            return (
-                                <td key={key}>{val}</td>
-                            )
-                        })}
-                    </tr>
-                    {dataObj.weight.map((val,key)=>{
-                        return(
-                            <tr key={key}>
-                                <td>隐藏节点{key+1}</td>
-                                {val.map((value,k)=>{
-                                    return(
-                                        <td key={k}>
-                                            {value}
-                                        </td>
-                                    )
-                                })}
-                                <td>隐藏节点{key+1}</td>
-                                {dataObj.value.map((valNew,keyNew)=>{
-                                    if(keyNew === key){
-                                        return(
-                                            <td key={keyNew}>
-                                                {valNew}
+                                <tr key={key}>
+                                    <td>隐藏节点{key + 1}</td>
+                                    {val.map((value, k) => {
+                                        return (
+                                            <td key={k}>
+                                                {value}
                                             </td>
                                         )
-                                    }else{
-                                        return false
-                                    }
-                                })}
-                            </tr>
-                        )
-                    })}
-                    </tbody>
-                </table>
-                <table border="1" cellSpacing="0" className="table">
-                    <tbody>
-                    <tr>
-                        <td rowSpan={dataObj.weight.length+2} style={{width:'80px'}}>权重=</td>
-                        <td>
-                        </td>
-                        {dataObj.weight.map((val, key) => {
-                            return (
-                                <td key={key}>隐层节点{key + 1}</td>
+                                    })}
+                                    <td>隐藏节点{key + 1}</td>
+                                    {inputToHiding.threshold.map((valNew, keyNew) => {
+                                        if (keyNew === key) {
+                                            return (
+                                                <td key={keyNew}>
+                                                    {valNew}
+                                                </td>
+                                            )
+                                        } else {
+                                            return false
+                                        }
+                                    })}
+                                </tr>
                             )
                         })}
-                        <td rowSpan={dataObj.weight.length+2} style={{width:'30px'}}>
+                        </tbody>
+                    </table>
+                    <table border="1" cellSpacing="0" className="table">
+                        <tbody>
+                        <tr>
+                            <td rowSpan={inputToHiding.weight.length + 2} style={{width: '80px'}}>权重=</td>
+                            <td colSpan='2'>
+                            </td>
+                            {inputToHiding.weight.map((val, key) => {
+                                return (
+                                    <td key={key}>隐层节点{key + 1}</td>
+                                )
+                            })}
+                            <td rowSpan={inputToHiding.weight.length + 2} style={{width: '30px'}}>
 
-                        </td>
-                        <td rowSpan={dataObj.weight.length+2} style={{width:'80px'}}>
-                            阈值=
-                        </td>
-                        <td>
+                            </td>
+                            <td rowSpan={inputToHiding.weight.length + 2} style={{width: '80px'}}>
+                                阈值=
+                            </td>
+                            <td>
 
-                        </td>
-                        <td>
+                            </td>
+                            <td>
 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            输出层节点
-                        </td>
-                        {dataObj.class.map((valClass,keyClass)=>{
-                            return(
-                                <td rowSpan='2' key={keyClass}>
-                                    {valClass}
-                                </td>
-                            )
-                        })}
-                        <td>
-                            输出层节点
-                        </td>
-                        <td rowSpan='2'>
-                            aaaa
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            class
-                        </td>
-                        <td>
-                            class
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                        {
+                            Object.keys(hidingToOutput.threshold).map(key => {
+                                return (
+                                    <tr key={key}>
+                                        <td>
+                                            输出层节点
+                                        </td>
+                                        <td>
+                                            {key}
+                                        </td>
+                                        {
+                                            Object.keys(hidingToOutput.weight).map(k => {
+                                                return (
+                                                    key === k ?
+                                                        hidingToOutput.weight[k].map((value, index) => {
+                                                            return (
+                                                                <td key={index}>
+                                                                    {value}
+                                                                </td>
+                                                            )
+                                                        }) : null
 
-                    </tbody>
-                </table>
-            </div>
+                                                )
+                                            })
+                                        }
+                                        <td>
+                                            {key}
+                                        </td>
+                                        <td>
+                                            {hidingToOutput.threshold[key]}
+                                        </td>
+
+                                    </tr>
+                                )
+                            })
+                        }
+
+
+                        </tbody>
+                    </table>
+                </div> : null
         );
     }
 }
